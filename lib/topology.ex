@@ -94,7 +94,8 @@ defmodule Topology do
           Pushserver.add_connections(k, connections)
         end
 
-        IO.inspect connections
+        #IO.inspect connections
+        connections
       end )
 
   end
