@@ -57,10 +57,10 @@ defmodule PROJ2 do
     if algorithm == "gossip" do
       node_list = Enum.map((1..num_nodes),fn(x) -> create_gossip_node(x, boss_pid) end)
       create_topology(topology, node_list, algorithm)
-      IO.inspect node_list
+      # IO.inspect node_list
       len = length(node_list)
       if len > 0 do
-        Boss.start_boss(boss_pid)
+        Boss.start_boss(boss_pid, len)
         Gossipserver.send_msg(Enum.at(node_list, :rand.uniform(len) - 1))
       end
       boss_pid
@@ -69,10 +69,10 @@ defmodule PROJ2 do
     if algorithm =="push-sum" do
       node_list = Enum.map((1..num_nodes),fn(x) -> create_push_node(x, boss_pid) end)
       create_topology(topology, node_list, algorithm)
-      IO.inspect node_list
+      # IO.inspect node_list
       len = length(node_list)
       if len > 0 do
-        Boss.start_boss(boss_pid)
+        Boss.start_boss(boss_pid, len)
         # :rand.uniform(len) - 1
         Pushserver.start_process(Enum.at(node_list, 0))
       end
