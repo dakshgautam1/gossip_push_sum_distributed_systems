@@ -14,6 +14,10 @@ defmodule Server.Boss do
     GenServer.call(server_pid, {:print})
   end
 
+  def add_failed_server(server_pid, failed_server_id) do
+    GenServer.call(server_pid, {:add_failed_server, failed_server_id})
+  end
+
   #Server APIs
   def init(max_time) do
     initial_state = %{
@@ -21,14 +25,20 @@ defmodule Server.Boss do
       end: -1,
       acknowledged_servers: [],
       max_time: max_time,
-      stopped_servers: []
+      failed_servers: []
     }
     {:ok, initial_state}
   end
 
   def handle_call({:start_time}, _caller, state) do
     start_time = :os.system_time(:millisecond)
-    new_state = %{start: start_time, end: -1, acknowledged_servers: state.acknowledged_servers, max_time: state.max_time}
+    new_state = %{
+      start: start_time,
+      end: -1,
+      acknowledged_servers: state.acknowledged_servers,
+      max_time: state.max_time,
+      failed_servers: []
+    }
     Process.send_after(self(), :close_process, state.max_time)
     {:reply, start_time, new_state}
   end
@@ -40,10 +50,14 @@ defmodule Server.Boss do
       end: -1,
       acknowledged_servers: new_acknowledged_servers,
       max_time: state.max_time,
-      stopped_servers: []
+      failed_servers: []
     }
     IO.puts "received length: #{length(state.acknowledged_servers)} -  #{state.start - :os.system_time(:millisecond)}"
     {:reply, state.start, new_state}
+  end
+
+  def handle_call({:add_failed_server, server_pid}, _caller, state) do
+
   end
 
   def handle_call({:print}, _caller, state) do
@@ -55,5 +69,6 @@ defmodule Server.Boss do
     #Process.exit(self(), :normal)
     {:noreply, state}
   end
+
 
 end
