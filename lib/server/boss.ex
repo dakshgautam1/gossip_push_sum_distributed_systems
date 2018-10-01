@@ -42,7 +42,7 @@ defmodule Server.Boss do
       max_time: state.max_time,
       stopped_servers: []
     }
-    IO.puts "received length: #{length(state.acknowledged_servers)} -  #{state.start - :os.system_time(:millisecond)}"
+    IO.puts "Node: #{inspect (server_pid)} Completed Nodes: #{length(state.acknowledged_servers)} Time Taken : #{:os.system_time(:millisecond) - state.start}"
     {:reply, state.start, new_state}
   end
 
