@@ -22,6 +22,14 @@ defmodule Server.Boss do
     GenServer.call(server_pid, {:add_failed_server, failed_server_id})
   end
 
+  defp calculate_convergence(completed, total) do
+    per = if completed != 0 and total != 0 do
+      completed/total
+    else
+      0
+    end
+    per * 100
+  end
   #Server APIs
   def init(max_time) do
     initial_state = %{
@@ -60,7 +68,8 @@ defmodule Server.Boss do
       failed_servers: state.failed_servers,
       total_servers: state.total_servers
     }
-    IO.puts "Total Nodes: #{state.total_servers} Node: #{inspect (server_pid)} Completed Nodes: #{length(state.acknowledged_servers)} Failed Nodes: #{length(state.failed_servers)} Time Taken : #{total_time}"
+    convergence = calculate_convergence(length(state.acknowledged_servers), state.total_servers)
+    IO.puts "Total Nodes: #{state.total_servers} Node: #{inspect (server_pid)} Completed Nodes: #{length(state.acknowledged_servers)} Failed Nodes: #{length(state.failed_servers)} Time Taken : #{total_time} Convergence: #{convergence}%"
     {:reply, state.start, new_state}
   end
 

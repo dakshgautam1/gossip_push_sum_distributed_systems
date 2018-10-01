@@ -25,12 +25,12 @@ defmodule Server.Gossipserver do
   # Server APIs
   def init(boss_pid) do
     # IO.puts "Server started #{inspect(boss_pid)}"
-    random_number = :rand.uniform(10000)
-    mod = rem(random_number, 25)
-    IO.puts "random no : #{random_number} "
-    if mod == 0 do
-      Process.send_after(self(), :fail, 10)
-    end
+    # random_number = :rand.uniform(10000)
+    # mod = rem(random_number, 25)
+    # IO.puts "random no : #{random_number} "
+    # if mod == 0 do
+    #   Process.send_after(self(), :fail, 10)
+    # end
 
     map = %{
       rumors: 0,
