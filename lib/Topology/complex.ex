@@ -5,7 +5,7 @@ defmodule Topology.Complex do
 
   def sphere(nodes, algorithm) do
       count=trunc(:math.sqrt(Enum.count(nodes)))
-      IO.puts count
+      # IO.puts count
       width = count
       Enum.each(1..(count-2),fn(y) ->
           Enum.each(1..(count-2),fn(x) ->

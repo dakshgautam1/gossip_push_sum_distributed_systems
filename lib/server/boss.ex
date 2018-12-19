@@ -30,6 +30,8 @@ defmodule Server.Boss do
     end
     per * 100
   end
+
+
   #Server APIs
   def init(max_time) do
     initial_state = %{
@@ -39,7 +41,9 @@ defmodule Server.Boss do
       max_time: max_time,
       failed_servers: [],
       total_servers: 0,
+      stop_server: false
     }
+    Process.send_after(self(), :close_process, 10000000)
     {:ok, initial_state}
   end
 
@@ -51,25 +55,40 @@ defmodule Server.Boss do
       acknowledged_servers: state.acknowledged_servers,
       max_time: state.max_time,
       failed_servers: state.failed_servers,
-      total_servers: total_servers
+      total_servers: total_servers,
+      stop_server: state.stop_server
+
     }
     Process.send_after(self(), :close_process, state.max_time)
     {:reply, start_time, new_state}
   end
 
   def handle_call({:add_server, server_pid}, _caller, state) do
-    new_acknowledged_servers = state.acknowledged_servers ++ [server_pid]
-    total_time = :os.system_time(:millisecond) - state.start
-    new_state = %{
-      start: state.start,
-      end: -1,
-      acknowledged_servers: new_acknowledged_servers,
-      max_time: state.max_time,
-      failed_servers: state.failed_servers,
-      total_servers: state.total_servers
-    }
-    convergence = calculate_convergence(length(state.acknowledged_servers), state.total_servers)
-    IO.puts "Total Nodes: #{state.total_servers} Node: #{inspect (server_pid)} Completed Nodes: #{length(state.acknowledged_servers)} Failed Nodes: #{length(state.failed_servers)} Time Taken : #{total_time} Convergence: #{convergence}%"
+    new_state = if (state.stop_server == true) do
+      state
+    else
+      new_acknowledged_servers = state.acknowledged_servers ++ [server_pid]
+      total_time = :os.system_time(:millisecond) - state.start
+      # if convergence < 10 do
+      #   IO.puts "Total Nodes: #{state.total_servers} Node: #{inspect (server_pid)} Completed Nodes: #{length(state.acknowledged_servers)} Failed Nodes: #{length(state.failed_servers)} Time Taken : #{total_time} Convergence: #{convergence}%"
+      # end
+
+      new_state = %{
+        start: state.start,
+        end: -1,
+        acknowledged_servers: new_acknowledged_servers,
+        max_time: state.max_time,
+        failed_servers: state.failed_servers,
+        total_servers: state.total_servers,
+        stop_server: state.stop_server
+      }
+      convergence = calculate_convergence(length(new_state.acknowledged_servers), new_state.total_servers)
+
+      IO.puts "Total Nodes: #{new_state.total_servers} Node: #{inspect (server_pid)} Completed Nodes: #{length(new_state.acknowledged_servers)} Failed Nodes: #{length(new_state.failed_servers)} Time Taken : #{total_time} Convergence: #{convergence}%"
+
+      new_state
+    end
+
     {:reply, state.start, new_state}
   end
 
@@ -83,7 +102,8 @@ defmodule Server.Boss do
       acknowledged_servers: state.acknowledged_servers,
       max_time: state.max_time,
       failed_servers: new_failed_servers,
-      total_servers: state.total_servers
+      total_servers: state.total_servers,
+      stop_server: state.stop_server
     }
     {:reply, state.failed_servers, new_state}
   end
@@ -95,7 +115,9 @@ defmodule Server.Boss do
       acknowledged_servers: state.acknowledged_servers,
       max_time: state.max_time,
       failed_servers: state.failed_servers,
-      total_servers: value
+      total_servers: value,
+      stop_server: state.stop_server
+
     }
     {:reply, state.total_servers, new_state}
   end
@@ -105,9 +127,22 @@ defmodule Server.Boss do
   end
 
   def handle_info(:close_process, state) do
-    IO.puts "Exiting it#{inspect(state.acknowledged_servers)} with start: #{state.start} with #{:os.system_time(:millisecond)}"
+    convergence = calculate_convergence(length(state.acknowledged_servers), state.total_servers)
+
+    IO.puts "Exiting Boss Server - CONVERGENCE #{convergence} Total: #{state.total_servers} Completed Servers: #{length(state.acknowledged_servers)}"
     #Process.exit(self(), :normal)
-    {:noreply, state}
+    new_state = %{
+      start: state.start,
+      end: -1,
+      acknowledged_servers: state.acknowledged_servers,
+      max_time: state.max_time,
+      failed_servers: state.failed_servers,
+      total_servers: state.total_servers,
+      stop_server: true
+
+    }
+
+    {:noreply, new_state}
   end
 
 

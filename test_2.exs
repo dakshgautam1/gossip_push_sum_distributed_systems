@@ -1,11 +1,11 @@
 defmodule Test1 do
-    
+
     def sphere(nodes) do
         count=trunc(:math.sqrt(Enum.count(nodes)))
-        IO.puts count  
+        # IO.puts count
         width = count
-        Enum.each(1..(count-2),fn(y) -> 
-            Enum.each(1..(count-2),fn(x) -> 
+        Enum.each(1..(count-2),fn(y) ->
+            Enum.each(1..(count-2),fn(x) ->
                 x1=x+1
                 x2=x-1
                 y1=y+1
@@ -23,7 +23,7 @@ defmodule Test1 do
 
         #for y co-ordinate zero
         y=0
-        Enum.each(1..(count-2),fn(x) -> 
+        Enum.each(1..(count-2),fn(x) ->
             y_below=1
             y_top=count-1
             x_left=x-1
@@ -40,7 +40,7 @@ defmodule Test1 do
 
         # for y co-ordinate last
         y=count-1
-        Enum.count(1..(count-2),fn(x) -> 
+        Enum.count(1..(count-2),fn(x) ->
             x_left=x-1
             x_right=x+1
             y_below=0
@@ -64,7 +64,7 @@ defmodule Test1 do
         nodeHereIndex= 0 + width*0
         nodeHere = Enum.at(nodes,nodeHereIndex)
         connectionGenerator(nodeHereIndex,nodeHere,connections,nodes)
-        
+
 
         #top right node
         index1 = count-2
@@ -109,9 +109,9 @@ defmodule Test1 do
         width=trunc(:math.sqrt(countHalfGrid))
         height=width
         #middle part grid
-        Enum.each(0..1,fn(z) -> 
-            Enum.each(1..(width-2),fn(y) -> 
-                Enum.each(1..(width-2),fn(x) -> 
+        Enum.each(0..1,fn(z) ->
+            Enum.each(1..(width-2),fn(y) ->
+                Enum.each(1..(width-2),fn(x) ->
                     x_left=x-1
                     x_right=x+1
                     y_top=y-1
@@ -136,8 +136,8 @@ defmodule Test1 do
         end)
 
         #for y co-ordinate zero
-        Enum.each(0..1,fn(z) -> 
-            Enum.each(1..(width-2),fn(x) -> 
+        Enum.each(0..1,fn(z) ->
+            Enum.each(1..(width-2),fn(x) ->
                 x_left=x-1
                 x_right=x+1
                 y_below=1
@@ -159,8 +159,8 @@ defmodule Test1 do
         end)
 
         #for y co-oridante last
-        Enum.each(0..1,fn(z) -> 
-            Enum.each(1..(width-2),fn(x) -> 
+        Enum.each(0..1,fn(z) ->
+            Enum.each(1..(width-2),fn(x) ->
                 x_left=x-1
                 x_right=x+1
                 y_top = width-2
@@ -182,7 +182,7 @@ defmodule Test1 do
         end)
 
         #top left nodes
-        Enum.each(0..1,fn(z) -> 
+        Enum.each(0..1,fn(z) ->
             x_right=1
             y_below=1
             z_here = if z == 0 do
@@ -200,7 +200,7 @@ defmodule Test1 do
             # IO.inspect connections
         end)
         #top right nodes
-        Enum.each(0..1,fn(z) -> 
+        Enum.each(0..1,fn(z) ->
             x_left=width-2
             y_below=1
             z_here = if z == 0 do
@@ -215,10 +215,10 @@ defmodule Test1 do
             nodeHereIndex= (width-1) + width*0 + width*height*z
             nodeHere = Enum.at(nodes,nodeHereIndex)
             connectionGenerator(nodeHereIndex,nodeHere,connections,nodes)
-            # IO.inspect connections            
+            # IO.inspect connections
         end)
         #bottom left nodes
-        Enum.each(0..1,fn(z) -> 
+        Enum.each(0..1,fn(z) ->
             x_right=1
             y_top=width-2
             z_here = if z == 0 do
@@ -236,7 +236,7 @@ defmodule Test1 do
             # IO.inspect connections
         end)
         #bottom right nodes
-        Enum.each(0..1,fn(z) -> 
+        Enum.each(0..1,fn(z) ->
             x_left=(width-2)
             y_top=width-2
             z_here = if z == 0 do

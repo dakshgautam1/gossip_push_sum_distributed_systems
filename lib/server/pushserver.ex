@@ -38,7 +38,6 @@ defmodule Server.Pushserver do
 
 
   def handle_call({:add_connections, conn_list}, _caller, state) do
-    #IO.puts "Genserver: #{inspect(self())} add connections: #{inspect(conn_list)}"
     new_list = state.connections ++ conn_list
     new_state = %{
       s: state.s,
@@ -68,7 +67,6 @@ defmodule Server.Pushserver do
 
 
   def handle_cast({:start_process}, state) do
-    IO.puts "I have started the process #{inspect(self())} with s: #{inspect(state.s)}  w: #{inspect(state.w)}"
 
     {new_s, new_w} = trigger(state)
     new_state = %{
@@ -86,7 +84,6 @@ defmodule Server.Pushserver do
   end
 
   def handle_cast({:send_recv_msg, s, w}, state) do
-
 
     if (state.saturated == true) do
       {:noreply, state}
@@ -111,7 +108,7 @@ defmodule Server.Pushserver do
     # IO.puts "#{ratio} Genserver: #{inspect(self())}, #{is_saturated} with s: #{inspect(s)}  w: #{inspect(w)} my half_s #{half_s} half_w #{half_w}"
 
     if (is_saturated == true) do
-      IO.puts "#{ratio} Genserver: #{inspect(self())} Ratio-list - #{inspect(new_ratios)}"
+      # IO.puts "#{ratio} Genserver: #{inspect(self())} Ratio-list - #{inspect(new_ratios)}"
       Enum.each(state.connections, fn(connection) ->
         Pushserver.remove_connection(connection, self()) end)
       Boss.add_completed_server(state.boss_pid, self())
@@ -136,7 +133,7 @@ defmodule Server.Pushserver do
     len = length(connections)
     if len > 0 do
       random_pid = Enum.at(connections, :rand.uniform(len) - 1)
-      # IO.puts "Got the rumor #{new_rumors} for #{inspect(self())}"
+      # IO.puts "Got the rumor #{new_rumors} for #{inspect(self())} for #{inspect new_state.ratios}"
       # GenServer.cast(random_pid, {:send_recv_msg, half_s, half_w})
       Pushserver.propagate_message(random_pid, half_s, half_w)
     end

@@ -7,7 +7,7 @@ defmodule Topology do
     start = Enum.at(nodes, index)
     Enum.map(nodes, fn(node) -> pointDistance(Enum.at(start, 1), Enum.at(start, 2), Enum.at(node, 1), Enum.at(node, 2)) end)
     |> Enum.with_index
-    |> Enum.filter(fn({number, _index}) -> number < 1 end)
+    |> Enum.filter(fn({number, _index}) -> number < 0.1 end)
     |> Enum.map(fn({_number, index}) -> Enum.at(nodes, index) |>  Enum.at(0) end)
   end
 
@@ -26,7 +26,7 @@ defmodule Topology do
             index == (Enum.count(nodes) -1) -> [Enum.at(nodes,index - 1)]
             true -> [Enum.at(nodes,index-1),Enum.at(nodes,index+1)]
           end
-        # IO.puts "#{inspect(node)} created connections #{inspect(connections)}"
+        # IO.puts "#{inspect(node)} created connections #{length(nodes)}"
         if (algorithm == "gossip") do
           Gossipserver.add_connections(node, connections)
         else
@@ -61,42 +61,34 @@ defmodule Topology do
 
 
   def create_topology("impline", nodes, algorithm) do
-      Enum.each(nodes,fn(k) ->
-        index=Enum.find_index(nodes,fn(x) -> x==k end)
-        connections = cond do
-          index == 0 ->
-            randNumberIndex = :rand.uniform(Enum.count(nodes)-1)
-            if randNumberIndex == 0 do
-              randNumberIndex = 2
-            end
-            [Enum.at(nodes,index+1),Enum.at(nodes,randNumberIndex)]
+    Enum.each(
+      nodes,
+      fn(node) ->
+        index = Enum.find_index(nodes, fn(x) -> x == node end)
+        connections =
+          cond do
+            index == 0 -> [Enum.at(nodes,index+1)]
+            index == (Enum.count(nodes) -1) -> [Enum.at(nodes,index - 1)]
+            true -> [Enum.at(nodes,index-1), Enum.at(nodes,index+1)]
+          end
 
-          index == (Enum.count(nodes) -1) ->
-            randNumberIndex = :rand.uniform(Enum.count(nodes)-1)
-            if randNumberIndex == index || randNumberIndex == (index-1) do
-              [Enum.at(nodes,index - 1),Enum.at(nodes,index-2)]
-            else
-              [Enum.at(nodes,index-1),Enum.at(nodes,randNumberIndex)]
-            end
+          random_node = Enum.at(nodes, :rand.uniform(length(nodes)) - 1)
+          new_connections = if (Enum.any?(connections, fn(y) -> y == random_node end) == false) and random_node != node do
+            new_x = connections ++ [random_node]
+            new_x
+          else
+            connections
+          end
 
-          true ->
-            #add random here and check for edge case
-            current_random_number = :rand.uniform(Enum.count(nodes)-1)
-            current_random_number = if current_random_number == index || current_random_number == index-1 || current_random_number == index+1  do
-              :rand.uniform(Enum.count(nodes)-1)
-            end
-             [Enum.at(nodes,index-1),Enum.at(nodes,index+1),Enum.at(nodes,current_random_number)]
-        end
-
+        # IO.puts "#{inspect(node)} created connections #{inspect(connections)}"
         if (algorithm == "gossip") do
-          Gossipserver.add_connections(k, connections)
+          Gossipserver.add_connections(node, new_connections)
         else
-          Pushserver.add_connections(k, connections)
+          Pushserver.add_connections(node, new_connections)
         end
 
-        #IO.inspect connections
-        connections
-      end )
+      end
+    )
 
   end
 

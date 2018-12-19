@@ -1,9 +1,0 @@
-{application,proj2,
-             [{applications,[kernel,stdlib,elixir,logger]},
-              {description,"proj2"},
-              {modules,['Elixir.PROJ2','Elixir.Server.Boss',
-                        'Elixir.Server.Gossipserver',
-                        'Elixir.Server.Pushserver','Elixir.Topology',
-                        'Elixir.Topology.Complex']},
-              {registered,[]},
-              {vsn,"0.1.0"}]}.

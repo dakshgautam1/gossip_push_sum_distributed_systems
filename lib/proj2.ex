@@ -1,6 +1,4 @@
 defmodule PROJ2 do
-  # TODO: check edge cases whent he list is empty
-  # TODO: find the distance.
 
   # Topologies here
   alias Server.Gossipserver
@@ -74,52 +72,15 @@ defmodule PROJ2 do
       if len > 0 do
         Boss.start_boss(boss_pid, len)
         # :rand.uniform(len) - 1
-        Pushserver.start_process(Enum.at(node_list, 0))
+        Pushserver.start_process(Enum.at(node_list, :rand.uniform(len) - 1))
       end
       nil
     end
 
+
+    :timer.sleep(1000000000)
     boss_pid
   end
 
 end
-
-
-
-# @moduledoc """
-#   Documentation for PROJ2.
-#   """
-
-#   @doc """
-#   Hello world.
-
-#   ## Examples
-
-#       iex> PROJ2.hello()
-#       :world
-
-#   """
-
-  # defmodule PushSum do
-  #   use GenServer
-  #   def init(messages) do
-  #     {:ok, messages}
-  #   end
-  #   def createNodes(numberOfNodes) do
-  #     if numberOfNodes > 0 do
-  #       nodeName = String.to_atom("node#{numberOfNodes}")
-  #       {:ok, pid} = GenServer.start_link(PushSum, 1, name: nodeName)
-  #       :global.register_name(nodeName,pid)
-  #       createNodes(numberOfNodes - 1)
-  #     end
-  #   end
-  #   def createSingleNode(nodeNumber) do
-  #     nodeName = String.to_atom("node#{nodeNumber}")
-  #     {:ok, pid} = GenServer.start_link(PushSum, 1, name: nodeName)
-  #     pid
-  #   end
-  #   #do stuff for PushSum
-  # end
-
-
 
